@@ -4,9 +4,9 @@ import bcrypt from "bcrypt";
 import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { fullName, username, password } = req.body;
   try {
-    if (!fullName || !email || !password) {
+    if (!fullName || !username || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -16,7 +16,7 @@ export const signup = async (req, res) => {
         .json({ message: "Password must be at least 6 characters long" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -25,7 +25,7 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      email,
+      username,
       fullName,
       password: hashedPassword,
     });
@@ -36,7 +36,7 @@ export const signup = async (req, res) => {
       res.status(201).json({
         id: newUser._id,
         fullName: newUser.fullName,
-        email: newUser.email,
+        username: newUser.username,
         profilePic: newUser.profilePic,
       });
     } else {
@@ -49,9 +49,9 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -67,7 +67,7 @@ export const login = async (req, res) => {
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
-      email: user.email,
+      username: user.username,
       profilePic: user.profilePic,
     });
   } catch (error) {
