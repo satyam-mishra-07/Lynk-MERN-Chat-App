@@ -68,7 +68,7 @@ export const userSearch = async (req, res) => {
           $or: queryWords.map((word) => ({
             $or: [
               { username: { $regex: escapeRegex(word), $options: "i" } },
-              { fullname: { $regex: escapeRegex(word), $options: "i" } },
+              { fullName: { $regex: escapeRegex(word), $options: "i" } },
             ],
           })),
         };

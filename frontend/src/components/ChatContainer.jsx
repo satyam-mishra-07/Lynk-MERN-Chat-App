@@ -1,11 +1,12 @@
+
 import { useChatStore } from "../store/useChatStore";
 import { useEffect, useRef } from "react";
-import ChatHeader from "./ChatHeader.jsx";
-import MessageInput from "./MessageInput.jsx";
-import MessageSkeleton from "./Skeletons/MessageSkeleton.jsx";
-import { useAuthStore } from "../store/useAuthStore.js";
-import { formatMessageTime } from "../lib/utils";
 
+import ChatHeader from "./ChatHeader";
+import MessageInput from "./MessageInput";
+import MessageSkeleton from "./skeletons/MessageSkeleton";
+import { useAuthStore } from "../store/useAuthStore";
+import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
   const {
@@ -24,9 +25,7 @@ const ChatContainer = () => {
 
     subscribeToMessages();
 
-    return () => {
-      unsubscribeFromMessages();
-    };
+    return () => unsubscribeFromMessages();
   }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ const ChatContainer = () => {
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
             ref={messageEndRef}
           >
-            <div className="chat-image avatar">
+            <div className=" chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
                   src={
@@ -73,7 +72,7 @@ const ChatContainer = () => {
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
-            <div className="chat-bubble flex flex-col">
+            <div className={`chat-bubble ${message.senderId === authUser._id ? "bg-primary text-primary-content/70" : "bg-base-200 text-base-content/70"} flex flex-col`}>
               {message.image && (
                 <img
                   src={message.image}

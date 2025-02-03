@@ -1,7 +1,10 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -14,54 +17,30 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
   socket: null,
 
-  connectSocket: () => {
-    const {authUser} = get();
-    if(!authUser || get().socket?.connected) return;
-
-    const socket = io(BASE_URL,{
-      query: {
-        userId: authUser._id,
-      },
-    });
-    socket.connect();
-
-    socket.on("onlineUsers", (useIds) => {
-      set({onlineUsers: useIds});
-    })
-
-    set({ socket:socket });
-  },
-  
-  disconnectSocket: () => {
-    if(get().socket?.connected) {
-      get().socket.disconnect();
-    }
-  },
-
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
+      console.log("Error in checkAuth:", error);
       set({ authUser: null });
-      console.log(`Error checking auth: ${error}`);
     } finally {
       set({ isCheckingAuth: false });
     }
   },
 
-  signup: async(data) => {
-    set({isSigningIn: true});
+  signup: async (data) => {
+    set({ isSigningUp: true });
     try {
-        const res = await axiosInstance.post("/auth/signup", data);
-        set({authUser: res.data});
-        toast.success("Account created successfully");
-        get.connectSocket();
+      const res = await axiosInstance.post("/auth/signup", data);
+      set({ authUser: res.data });
+      toast.success("Account created successfully");
+      get().connectSocket();
     } catch (error) {
-        toast.error(error.response.data.message);
-    }finally {
-        set({isSigningIn: false});
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isSigningUp: false });
     }
   },
 
@@ -76,30 +55,6 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isLoggingIn: false });
-    }
-  },
-
-  search: async (query, page) => {
-    set({ isSearching: true });
-    try {
-      const queryParam = query ? query : "";
-      const pageParam = page ? page : 1;
-      const limitParam = 10;
-  
-      const res = await axiosInstance.get(`/auth/search`, {
-        params: {
-          query: queryParam,
-          page: pageParam,
-          limit: limitParam,
-        },
-      });
-  
-      set({ searchResults: res.data });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred");
-      console.log("error in search: ", error);
-    } finally {
-      set({ isSearching: false });
     }
   },
 
@@ -127,5 +82,49 @@ export const useAuthStore = create((set, get) => ({
       set({ isUpdatingProfile: false });
     }
   },
- 
+
+  connectSocket: () => {
+    const { authUser } = get();
+    if (!authUser || get().socket?.connected) return;
+
+    const socket = io(BASE_URL, {
+      query: {
+        userId: authUser._id,
+      },
+    });
+    socket.connect();
+
+    set({ socket: socket });
+
+    socket.on("onlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
+    });
+  },
+
+  disconnectSocket: () => {
+    if (get().socket?.connected) get().socket.disconnect();
+  },
+
+  search: async (query, page) => {
+    set({ isSearching: true });
+    try {
+      const queryParam = query ? query : "";
+      const pageParam = page ? page : 1;
+      const limitParam = 10;
+
+      const res = await axiosInstance.get(`/auth/search`, {
+        params: {
+          query: queryParam,
+          page: pageParam,
+          limit: limitParam,
+        },
+      });
+      set({ searchResults: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred");
+      console.log("error in search: ", error);
+    } finally {
+      set({ isSearching: false });
+    }
+  },
 }));

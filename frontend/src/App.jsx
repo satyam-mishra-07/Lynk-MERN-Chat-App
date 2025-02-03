@@ -12,6 +12,7 @@ import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import Search from "./pages/Search.jsx";
 import Lynks from "./pages/Lynks.jsx";
+import Request from "./pages/Request.jsx";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -43,6 +44,7 @@ function App() {
           <Route path="/profile" element={authUser ? <Profile /> : <Navigate to="/login"/>} />
           <Route path="/search" element={authUser ? <Search /> : <Navigate to="/login"/>} />
           <Route path="/lynks" element={authUser ? <Lynks /> : <Navigate to="/login"/>} />
+          <Route path="/requests" element={authUser ? <Request /> : <Navigate to="/login"/>} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Home />} />
         </Routes>
