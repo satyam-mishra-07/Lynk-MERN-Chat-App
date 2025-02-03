@@ -7,8 +7,11 @@ export const useLynkStore = create((set, get) => ({
   lynkRequest: [],
   lynkSent: [],
   myLynk: [],
+  isGettingRequests: false,
+  isGettingLynks: false,
 
   getLynkRequests: async () => {
+    set({ isGettingRequests: true });
     try {
       const res = await axiosInstance.get("/request/incoming");
       set({ lynkRequest: res.data });
@@ -17,6 +20,8 @@ export const useLynkStore = create((set, get) => ({
         error.response?.data?.message || "Failed to fetch Lynk requests"
       );
       return [];
+    } finally {
+      set({ isGettingRequests: false });
     }
   },
 
@@ -81,12 +86,15 @@ export const useLynkStore = create((set, get) => ({
   },
 
   getLynks: async () => {
+    set({ isGettingLynks: true });
     try {
       const res = await axiosInstance.get("/request/my-lynks");
       set({ myLynk: res.data });
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch Lynks");
       return [];
+    } finally {
+      set({ isGettingLynks: false });
     }
   },
 
