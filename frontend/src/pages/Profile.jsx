@@ -106,7 +106,7 @@ const ProfilePage = () => {
               </div>
               <div className="flex items-center justify-between py-2 border-b border-zinc-700 hover:cursor-pointer" onClick={handleLynkClick}>
                 <span>My Lynks</span>
-                <span>{authUser.lynks.length || 0}</span>
+                <span>{authUser.lynks?.length || 0}</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span>Account Status</span>
