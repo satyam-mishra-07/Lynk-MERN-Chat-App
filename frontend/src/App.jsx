@@ -10,6 +10,8 @@ import { useThemeStore } from "./store/useThemeStore.js";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
+import Search from "./pages/Search.jsx";
+import Lynks from "./pages/Lynks.jsx";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -39,6 +41,8 @@ function App() {
           <Route path="/signup" element={!authUser ? <Signup /> : <Navigate to="/"/>} />
           <Route path="/login" element={!authUser ? <Login /> : <Navigate to="/"/>} />
           <Route path="/profile" element={authUser ? <Profile /> : <Navigate to="/login"/>} />
+          <Route path="/search" element={authUser ? <Search /> : <Navigate to="/login"/>} />
+          <Route path="/lynks" element={authUser ? <Lynks /> : <Navigate to="/login"/>} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Home />} />
         </Routes>

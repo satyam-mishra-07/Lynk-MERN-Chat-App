@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import requestRoutes from "./routes/request.route.js";
 import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import { app, server } from "./lib/socket.js";
@@ -28,6 +29,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+app.use("/api/request", requestRoutes);
 app.use("/api/messages", messageRoutes);
 
 if(process.env.NODE_ENV === 'production'){

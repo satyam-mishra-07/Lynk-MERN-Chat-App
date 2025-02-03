@@ -3,14 +3,14 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
-
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+  isSearching: false,
+  searchResults: [],
   onlineUsers: [],
   socket: null,
 
@@ -79,6 +79,30 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  search: async (query, page) => {
+    set({ isSearching: true });
+    try {
+      const queryParam = query ? query : "";
+      const pageParam = page ? page : 1;
+      const limitParam = 10;
+  
+      const res = await axiosInstance.get(`/auth/search`, {
+        params: {
+          query: queryParam,
+          page: pageParam,
+          limit: limitParam,
+        },
+      });
+  
+      set({ searchResults: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred");
+      console.log("error in search: ", error);
+    } finally {
+      set({ isSearching: false });
+    }
+  },
+
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
@@ -103,5 +127,5 @@ export const useAuthStore = create((set, get) => ({
       set({ isUpdatingProfile: false });
     }
   },
-  
+ 
 }));

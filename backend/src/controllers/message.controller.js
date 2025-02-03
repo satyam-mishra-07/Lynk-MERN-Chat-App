@@ -3,19 +3,31 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../model/message.model.js";
 import User from "../model/user.model.js";
 
-export const getUsersForSidebar = async (req, res) => {
+export const getLynkedUser = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
+
+    const loggedInUser = await User.findById(loggedInUserId);
+    if (!loggedInUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    // if (!loggedInUser.lynks || loggedInUser.lynks.length === 0) {
+    //   return res.status(200).json({ message: "No linked users found" });
+    // }
+
     const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
+      _id: { $in: loggedInUser.lynks },
     }).select("-password");
 
     res.status(200).json(filteredUsers);
   } catch (error) {
-    console.error("Error in getUsersForSidebar: ", error.message);
+    console.error("Error in getLynkedUser: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
 
 export const getMessages = async (req, res) => {
   try {
