@@ -6,8 +6,10 @@ import { useLynkStore } from "../store/useLynkStore.js";
 export default function Search() {
   const { searchResults, isSearching, search, authUser } = useAuthStore();
   const {
+    myLynk,
     lynkRequest,
     lynkSent,
+    getLynks,
     sendLynkRequest,
     getLynkRequests,
     getSentLynkRequests,
@@ -23,11 +25,12 @@ export default function Search() {
     search(query, 1);
     getLynkRequests();
     getSentLynkRequests();
+    getLynks();
   }, []);
 
   useEffect(() => {
     search(query, currentPage);
-  }, [query, currentPage, search, lynkRequest, authUser, lynkSent]);
+  }, [query, currentPage, search, lynkRequest, authUser, lynkSent, myLynk]);
 
   const pages = searchResults?.totalPages || 1;
 
@@ -50,6 +53,7 @@ export default function Search() {
   const handleAcceptRequest = async (senderID) => {
     await acceptLynkRequest(senderID);
     await getLynkRequests();
+    await getLynks();
   };
 
   const handleRejectRequest = async (senderID) => {
@@ -66,6 +70,7 @@ export default function Search() {
     await removeLynk(lynkId);
     await getLynkRequests();
     await getSentLynkRequests();
+    await getLynks();
   };
 
   return (
